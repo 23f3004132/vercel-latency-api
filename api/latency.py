@@ -42,15 +42,16 @@ def percentile(data: List[float], p: float) -> float:
 async def check_latency(q: Query):
     data = load_data()
     result: Dict[str, Dict[str, float]] = {}
+
     for region in q.regions:
         records = [r for r in data if r.get("region") == region]
         latencies = [float(r.get("latency_ms", 0)) for r in records]
         uptimes = [float(r.get("uptime_pct", 0)) for r in records]
 
-        avg_latency = float(sum(latencies) / len(latencies)) if latencies else 0.0
-        p95_latency = float(percentile(latencies, 95)) if latencies else 0.0
-        avg_uptime = float(sum(uptimes) / len(uptimes)) if uptimes else 0.0
-        breaches = int(sum(1 for v in latencies if v > q.threshold_ms))
+        avg_latency = sum(latencies) / len(latencies) if latencies else 0.0
+        p95_latency = percentile(latencies, 95) if latencies else 0.0
+        avg_uptime = sum(uptimes) / len(uptimes) if uptimes else 0.0
+        breaches = sum(1 for v in latencies if v > q.threshold_ms)
 
         result[region] = {
             "avg_latency": round(avg_latency, 3),
@@ -59,4 +60,4 @@ async def check_latency(q: Query):
             "breaches": breaches,
         }
 
-    return result
+    return {"regions": result}
