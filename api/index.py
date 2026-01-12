@@ -1,6 +1,4 @@
-from fastapi import FastAPI
-from api.latency import app as latency_app
+from api.latency import app
 
-# Root application Vercel will detect. Mount the existing latency app
-app = FastAPI()
-app.mount("/api/latency", latency_app)
+# Re-export the FastAPI `app` from `api/latency.py` so Vercel's Python builder
+# detects the FastAPI application and exposes the routes defined there.
