@@ -1,4 +1,5 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import json
@@ -12,6 +13,17 @@ class Query(BaseModel):
 
 
 router = APIRouter()
+
+# Also export a FastAPI `app` so Vercel's per-file mapping (api/latency.py)
+# exposes the endpoint directly at /api/latency and includes CORS headers.
+app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+app.include_router(router, prefix="/")
 
 DATA_PATH = pathlib.Path(__file__).parent.parent / "q-vercel-latency.json"
 
