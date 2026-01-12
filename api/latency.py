@@ -38,7 +38,7 @@ def percentile(data: List[float], p: float) -> float:
     return float(d0 + d1)
 
 
-@router.post("/", tags=["latency"])
+@router.post("", tags=["latency"])
 async def check_latency(q: Query):
     data = load_data()
     result: Dict[str, Dict[str, float]] = {}
