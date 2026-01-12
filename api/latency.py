@@ -1,5 +1,4 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 from pydantic import BaseModel
 from typing import List, Dict, Any
 import json
@@ -12,13 +11,7 @@ class Query(BaseModel):
     threshold_ms: float
 
 
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["POST"],
-    allow_headers=["*"],
-)
+router = APIRouter()
 
 DATA_PATH = pathlib.Path(__file__).parent.parent / "q-vercel-latency.json"
 
@@ -45,7 +38,7 @@ def percentile(data: List[float], p: float) -> float:
     return float(d0 + d1)
 
 
-@app.post("/")
+@router.post("/", tags=["latency"])
 async def check_latency(q: Query):
     data = load_data()
     result: Dict[str, Dict[str, float]] = {}
